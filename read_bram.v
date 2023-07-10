@@ -44,8 +44,8 @@ module read_bram(
 
     /*****************************Register*********************************/
     reg         r_uart_enable   ;
-    reg         r_lsm_enable    ;
-    reg         r_lsm_counter   ;
+    reg         r_bram_flag     ;
+    reg [1:0]   r_bram_cnt      ;  // BRAM have 2 cycles' latency, wait one more cycle for robustness
     reg [11:0]  r_bram_addr     ;
     reg [1:0]   r_exec_state    ;
     reg [1:0]   r_next_state    ;
@@ -55,6 +55,7 @@ module read_bram(
     /*****************************Wire************************************/
     wire        w_clk           ;
     wire        w_resetn        ;
+    wire        w_uart_busy     ;
     wire [7:0]  w_bram_dout     ;
     wire [7:0]  w_uart_txdata   ;
 
@@ -64,10 +65,13 @@ module read_bram(
     assign led              =   r_led       ;
 
     /****************************Processing*****************************/
-    // always @(posedge w_clk) begin
-    //     if(!w_resetn) begin
-    //     end
-    // end
+    always @(posedge w_clk) begin
+        if(!w_resetn) begin
+            r_exec_state <= IDLE;
+        end else begin
+            r_exec_state <= r_next_state;
+        end
+    end
 
     /*******************************FSM************************************/
 
@@ -83,47 +87,47 @@ module read_bram(
     
     always@(posedge w_clk)begin
     case(r_exec_state)
+        IDLE: r_next_state = send_enable ? READ : IDLE;
+        READ: r_next_state = (r_bram_flag&&r_bram_cnt==2'd3) ? SEND : READ;
+        SEND: r_next_state = NEXT;
+        NEXT: r_next_state = (r_bram_addr==WRITE_DEPTH-1) ? IDLE : (w_uart_busy ? NEXT : READ);
+        default: r_next_state = IDLE;
+    endcase
+    end
+
+    always@(posedge w_clk)begin
+    case(r_exec_state)
         IDLE: begin
             r_led <= 8'b11000000;
-            r_uart_enable <= 1'b0;
             r_bram_addr <= 12'd0;
-            if(send_enable)begin
-                r_next_state <= SEND;
-            end else begin
-                r_next_state <= IDLE;
-            end
+            r_bram_flag <= 1'b0;
+            r_uart_enable <= 1'b0;
         end
         READ: begin
             r_led <= 8'b00110000;
-            r_bram_dout <= w_bram_dout;
-            r_next_state <= SEND;
+            if(!r_bram_flag)begin
+                r_bram_flag <= 1'b1;
+                r_bram_cnt <= 2'd0;
+            end else if(r_bram_cnt==2'd2)begin
+                r_bram_flag <= 1'b0;
+                r_bram_dout <= w_bram_dout;
+            end else begin
+                r_bram_cnt <= r_bram_cnt + 2'd1;
+            end
         end
         SEND: begin
             r_led <= 8'b00001100;
             r_uart_enable <= 1'b1;
-            r_lsm_enable <= 1'b1;
-            r_next_state <= NEXT;
         end
         NEXT: begin
             r_led <= 8'b00000011;
-            r_uart_enable <= 1'b0;
-            if(r_bram_addr==WRITE_DEPTH)begin
-                r_next_state <= IDLE;
-            end else begin
-                r_next_state <= READ;
+            if(r_bram_addr!=WRITE_DEPTH-1 && !w_uart_busy)begin
+                r_uart_enable <= 1'b0;
                 r_bram_addr <= r_bram_addr + 1;
             end
         end
-        default: r_next_state <= r_next_state;
+        default: r_led <= 8'b00000000;
     endcase
-    end
-    
-    always @(posedge w_clk) begin
-        if(!w_resetn) begin
-            r_exec_state <= IDLE;
-        end else begin
-            r_exec_state <= r_next_state;
-        end
     end
 
     /****************************Instanation*****************************/
@@ -141,6 +145,7 @@ module read_bram(
         .check_sel(1'b0),   // Even
         .din(w_uart_txdata),      
         .req(r_uart_enable),
+        .busy(w_uart_busy),
         .TX(uart_txd)
     );
 
