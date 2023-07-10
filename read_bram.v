@@ -19,16 +19,6 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
-//////////////////////////////////////////////////////////////////////////////////
-// Problem Unsolved:
-//  1. FSM never stop. That is, addr==WRITE_DEPTH*WRITE_WIDTH is never met.
-//     IDEA: An overload may exist. addr is only 12 bits indeed.
-//  2. SEND not completed. LSM constructing in progress. 
-//     Now seperate sending part to another file.
-//////////////////////////////////////////////////////////////////////////////////
-
-
 module read_bram(
     input           sys_clk_p,
     input           sys_clk_n,
@@ -39,7 +29,6 @@ module read_bram(
     output [7:0]    led
     );
     /*****************************Parameter*********************************/
-    parameter   WRITE_LENTH =   8;
     parameter   WRITE_DEPTH =   2048;
 
     /*****************************Register*********************************/
@@ -74,12 +63,6 @@ module read_bram(
     end
 
     /*******************************FSM************************************/
-
-    // WRITE BLOCK MEMORY FSM
-
-
-
-    // READ BLOCK MEMORY FSM
     parameter   IDLE = 2'b00,
                 READ = 2'b01,
                 SEND = 2'b10,
@@ -88,7 +71,7 @@ module read_bram(
     always@(posedge w_clk)begin
     case(r_exec_state)
         IDLE: r_next_state = send_enable ? READ : IDLE;
-        READ: r_next_state = (r_bram_flag&&r_bram_cnt==2'd3) ? SEND : READ;
+        READ: r_next_state = (r_bram_flag&&r_bram_cnt==2'd2) ? SEND : READ;
         SEND: r_next_state = NEXT;
         NEXT: r_next_state = (r_bram_addr==WRITE_DEPTH-1) ? IDLE : (w_uart_busy ? NEXT : READ);
         default: r_next_state = IDLE;
@@ -124,6 +107,9 @@ module read_bram(
             if(r_bram_addr!=WRITE_DEPTH-1 && !w_uart_busy)begin
                 r_uart_enable <= 1'b0;
                 r_bram_addr <= r_bram_addr + 1;
+            end else begin
+                r_uart_enable <= r_uart_enable;
+                r_bram_addr <= r_bram_addr;
             end
         end
         default: r_led <= 8'b00000000;

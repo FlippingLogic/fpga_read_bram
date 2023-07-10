@@ -111,14 +111,14 @@ module new_uart_tx(
     case(n_cnt)
         0: TX = 1'b1; //此时的波特率不是一个完整的周期，等待进入下一个周期
         1: TX = 1'b0; //start
-        2: TX = din_reg[7];
-        3: TX = din_reg[6];
-        4: TX = din_reg[5];
-        5: TX = din_reg[4];
-        6: TX = din_reg[3];
-        7: TX = din_reg[2];
-        8: TX = din_reg[1]; 
-        9: TX = din_reg[0];
+        2: TX = din_reg[0];
+        3: TX = din_reg[1];
+        4: TX = din_reg[2];
+        5: TX = din_reg[3];
+        6: TX = din_reg[4];
+        7: TX = din_reg[5];
+        8: TX = din_reg[6]; 
+        9: TX = din_reg[7];
         10: TX = check; //校验
         11: TX = 1'b1; //stop
         default TX = 1'b1;
