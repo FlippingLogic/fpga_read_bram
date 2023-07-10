@@ -46,7 +46,7 @@ module read_bram(
     reg         r_uart_enable   ;
     reg         r_lsm_enable    ;
     reg         r_lsm_counter   ;
-    reg [13:0]  r_bram_addr     ;
+    reg [11:0]  r_bram_addr     ;
     reg [1:0]   r_exec_state    ;
     reg [1:0]   r_next_state    ;
     reg [7:0]   r_bram_dout     ;
@@ -55,7 +55,6 @@ module read_bram(
     /*****************************Wire************************************/
     wire        w_clk           ;
     wire        w_resetn        ;
-    wire        w_uart_busy     ;
     wire [7:0]  w_bram_dout     ;
     wire [7:0]  w_uart_txdata   ;
 
@@ -87,7 +86,7 @@ module read_bram(
         IDLE: begin
             r_led <= 8'b11000000;
             r_uart_enable <= 1'b0;
-            r_bram_addr <= 14'd0;
+            r_bram_addr <= 12'd0;
             if(send_enable)begin
                 r_next_state <= SEND;
             end else begin
@@ -99,7 +98,7 @@ module read_bram(
             r_bram_dout <= w_bram_dout;
             r_next_state <= SEND;
         end
-        SEND: begin // Start the LSM
+        SEND: begin
             r_led <= 8'b00001100;
             r_uart_enable <= 1'b1;
             r_lsm_enable <= 1'b1;
@@ -108,7 +107,7 @@ module read_bram(
         NEXT: begin
             r_led <= 8'b00000011;
             r_uart_enable <= 1'b0;
-            if(r_bram_addr==WRITE_DEPTH*WRITE_LENTH)begin
+            if(r_bram_addr==WRITE_DEPTH)begin
                 r_next_state <= IDLE;
             end else begin
                 r_next_state <= READ;
@@ -142,7 +141,6 @@ module read_bram(
         .check_sel(1'b0),   // Even
         .din(w_uart_txdata),      
         .req(r_uart_enable),
-        .busy(w_uart_busy),
         .TX(uart_txd)
     );
 

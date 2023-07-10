@@ -27,7 +27,6 @@ module new_uart_tx(
     input       check_sel       ,
     input [7:0] din             ,
     input       req             ,
-    output      busy            ,
     output reg  TX
     );
 
@@ -52,8 +51,6 @@ module new_uart_tx(
     wire        e_check;
     wire        o_check;
     wire        check;
-    //标志是否发送完成
-    assign      busy = n_cnt_flag;
 
     //输入数据寄存
     always@(posedge CLK_50M)	
