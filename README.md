@@ -2,17 +2,16 @@
  
 Data Transfer:  Uart
 
-    Baud Rate   9600
+    Baud Rate   	9600
 	
-    Parity Bit  Even
+    Parity Bit  	Even
 	
-    Stop Bit    1
+    Stop Bit    	1
 	
-    Data Length 8
-	
-FPGA:           Xilinx Virtex-7 xc7vx485tffg1761-2
+    Data Length 	8
+    
 
-Board:          Xilinx VC707
+FPGA:           Xilinx VC707 Virtex-7 xc7vx485tffg1761-2
 
 Current Target: Read memory from block RAM and send it to PC in sepecific format.
 
