@@ -1,6 +1,4 @@
-﻿Language:       Verilog
- 
-Data Transfer:  Uart
+﻿Data Transfer COM Type:  Uart
 
     Baud Rate   	9600
 	
@@ -11,8 +9,11 @@ Data Transfer:  Uart
     Data Length 	8
     
 
-FPGA:           Xilinx VC707 Virtex-7 xc7vx485tffg1761-2
+FPGA:           Xilinx VC707 
 
-Current Target: Read memory from block RAM and send it to PC in sepecific format.
+	Virtex-7 xc7vx485tffg1761-2
 
-Next step work: Using power gate to get random value of BRAM.
+
+This is part of the work for PUF design. Mainly focused SRAM based PUFs.
+
+Repository created and developed with VLSI Design Institute of Zhejiang University.
