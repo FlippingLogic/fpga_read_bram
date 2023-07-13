@@ -1,4 +1,10 @@
-﻿Data Transfer COM Type:  Uart
+# fpga_read_bram
+
+Summer research project at VLSI Design Institute, Yuquan Campus, Zhejiang University.
+
+This is part of the work for PUF design. Mainly focused SRAM based PUFs.
+
+Data Transfer COM:  Uart
 
     Baud Rate   	9600
 	
@@ -12,8 +18,3 @@
 FPGA:           Xilinx VC707 
 
 	Virtex-7 xc7vx485tffg1761-2
-
-
-This is part of the work for PUF design. Mainly focused SRAM based PUFs.
-
-Repository created and developed with VLSI Design Institute of Zhejiang University.
