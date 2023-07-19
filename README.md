@@ -15,6 +15,6 @@ Data Transfer COM:  Uart
     Data Length 	8
     
 
-FPGA:           Xilinx VC707 
+FPGA:  Xilinx VC707  Virtex-7 xc7vx485tffg1761-2
 
-	Virtex-7 xc7vx485tffg1761-2
+( PangoMicro Titan-2 based implementation is under development )
